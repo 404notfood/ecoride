@@ -1,11 +1,18 @@
 {
-  "name": "ecoride3",
-  "version": "0.1.0",
+  "name": "ecoride",
+  "version": "4.1.b",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "lint": "next lint",
+    "lint:accessibility": "eslint . --ext .ts,.tsx --config .eslintrc.accessibility.js",
+    "test:accessibility": "jest tests/accessibility.test.tsx",
+    "accessibility:check": "node scripts/accessibility-check.js",
+    "accessibility:audit": "lighthouse-ci",
+    "accessibility:full": "npm run accessibility:check && npm run lint:accessibility && npm run test:accessibility",
+    "pre-commit": "npm run accessibility:check && npm run lint"
   },
   "dependencies": {
     "@prisma/client": "^6.15.0",

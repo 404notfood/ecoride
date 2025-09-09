@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🔍 Vérification de l'accessibilité avant commit..."
+
+# Vérification de l'accessibilité
+npm run accessibility:check
+
+# Vérification ESLint
+npm run lint
+
+echo "✅ Vérifications d'accessibilité terminées"

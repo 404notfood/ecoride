@@ -1,8 +1,9 @@
 "use client";
 
 import { Moon, SunDim } from "lucide-react";
-import { useState, useRef } from "react";
+import { useRef, useEffect, useState } from "react";
 import { flushSync } from "react-dom";
+import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 
 type props = {
@@ -10,15 +11,23 @@ type props = {
 };
 
 export const AnimatedThemeToggler = ({ className }: props) => {
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+  const { theme, setTheme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
+
+  // Éviter l'hydratation mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const changeTheme = async () => {
-    if (!buttonRef.current) return;
+    if (!buttonRef.current || !mounted) return;
+
+    const newTheme = resolvedTheme === "dark" ? "light" : "dark";
 
     await document.startViewTransition(() => {
       flushSync(() => {
-        const dark = document.documentElement.classList.toggle("dark");
-        setIsDarkMode(dark);
+        setTheme(newTheme);
       });
     }).ready;
 
@@ -45,8 +54,25 @@ export const AnimatedThemeToggler = ({ className }: props) => {
       },
     );
   };
+
+  // Éviter le rendu avant l'hydratation
+  if (!mounted) {
+    return (
+      <button className={cn(className)}>
+        <Moon />
+      </button>
+    );
+  }
+
+  const isDarkMode = resolvedTheme === "dark";
+
   return (
-    <button ref={buttonRef} onClick={changeTheme} className={cn(className)}>
+    <button 
+      ref={buttonRef} 
+      onClick={changeTheme} 
+      className={cn(className)}
+      aria-label={`Passer au mode ${isDarkMode ? "clair" : "sombre"}`}
+    >
       {isDarkMode ? <SunDim /> : <Moon />}
     </button>
   );
